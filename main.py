@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
 
 df = pd.read_csv('data/train.csv')
 
@@ -34,20 +36,23 @@ test_df = pd.get_dummies(test_df, columns=['Gender', 'City', 'Working Profession
 test_df = test_df.reindex(columns=X_train.columns, fill_value=0)
 
 
-
-print(df['Depression'].value_counts())
+# TRAIN MODEL
 
 clf = RandomForestClassifier(class_weight='balanced')
 clf.fit(X_train, y_train)
 
 
+# PREDICT FOR TEST DATA
+y_pred = clf.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: ", accuracy)
+
+
+## PREDICT FOR SUBMISSION
+
 test_df['Depression'] = clf.predict(test_df)
-
 test_df['id'] = test_df_id
-
 submission = test_df[['id', 'Depression']]
-
 submission.to_csv('submission.csv', index=False)
 
-
-print(submission.shape)
