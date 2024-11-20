@@ -1,6 +1,5 @@
 import pandas as pd
-from sklearn import svm 
-from sklearn import metrics
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('data/train.csv')
@@ -33,16 +32,22 @@ X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['id', 'Name
 test_df = test_df.drop(columns=['Academic Pressure', 'CGPA', 'Study Satisfaction'], errors='ignore')
 test_df = pd.get_dummies(test_df, columns=['Gender', 'City', 'Working Professional or Student', 'Profession', 'Sleep Duration', 'Dietary Habits','Degree', 'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness'], drop_first='True')
 test_df = test_df.reindex(columns=X_train.columns, fill_value=0)
-test_df = test_df.dropna()
 
-# clf = svm.SVC(kernel='poly')
 
-# clf.fit(X_train, y_train)
 
-# test_df['Depression'] = clf.predict(test_df)
+print(df['Depression'].value_counts())
 
-# test_df['id'] = test_df_id
+clf = RandomForestClassifier(class_weight='balanced')
+clf.fit(X_train, y_train)
 
-# submission = test_df[['id', 'Depression']]
 
-# submission.to_csv('submission.csv', index=False)
+test_df['Depression'] = clf.predict(test_df)
+
+test_df['id'] = test_df_id
+
+submission = test_df[['id', 'Depression']]
+
+submission.to_csv('submission.csv', index=False)
+
+
+print(submission.shape)
